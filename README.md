@@ -26,7 +26,13 @@ The upstream [dgtlmoon/changedetection.io](https://github.com/dgtlmoon/changedet
 ## After: Automated Pipeline
 
 ```mermaid
-git push → GitHub Actions → buildx build → smoke test → Trivy scan → SBOM → GHCR push
+flowchart LR
+  A[git push] --> B[GitHub Actions]
+  B --> C[buildx build]
+  C --> D[smoke test]
+  D --> E[Trivy scan]
+  E --> F[SBOM]
+  F --> G[GHCR push]
 ```
 
 Every push to main goes through:
