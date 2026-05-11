@@ -35,7 +35,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          tags: ghcr.io/dynamickarabo/changedetection-deployment:${{ github.sha }}
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -44,7 +44,7 @@ jobs:
         run: |
           docker run --rm -d --name cd-test -p 5000:5000 \
             -e PORT=5000 \
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/dynamickarabo/changedetection-deployment:${{ github.sha }}
           sleep 5
           curl -sf http://localhost:5000/worker-health || exit 1
           echo "Healthcheck passed ✅"
@@ -53,7 +53,7 @@ jobs:
       - name: Trivy vulnerability scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          image-ref: ghcr.io/dynamickarabo/changedetection-deployment:${{ github.sha }}
           format: sarif
           output: trivy-results.sarif
           severity: CRITICAL,HIGH
@@ -69,7 +69,7 @@ jobs:
       - name: Generate SBOM
         uses: anchore/sbom-action@v0.18.0
         with:
-          image: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          image: ghcr.io/dynamickarabo/changedetection-deployment:${{ github.sha }}
           format: spdx-json
           output-file: sbom.spdx.json
 
@@ -83,11 +83,11 @@ jobs:
       - name: Push to GHCR
         if: github.ref == 'refs/heads/main'
         run: |
-          docker tag ghcr.io/${{ github.repository }}:${{ github.sha }} ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:latest
-          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+          docker tag ghcr.io/dynamickarabo/changedetection-deployment:${{ github.sha }} ghcr.io/dynamickarabo/changedetection-deployment:latest
+          docker push ghcr.io/dynamickarabo/changedetection-deployment:latest
+          docker push ghcr.io/dynamickarabo/changedetection-deployment:${{ github.sha }}
 
       - name: Check image size
         run: |
-          IMG_SIZE=$(docker image inspect ghcr.io/${{ github.repository }}:${{ github.sha }} --format='{{.Size}}' | numfmt --to=iec)
+          IMG_SIZE=$(docker image inspect ghcr.io/dynamickarabo/changedetection-deployment:${{ github.sha }} --format='{{.Size}}' | numfmt --to=iec)
           echo "Image size: $IMG_SIZE"
